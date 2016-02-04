@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="angular/angular-animate.min.js"></script>
+<script src="pong.js"></script>
+<link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="pong.css">
+<body>
+
+<div id="app"
+    ng-app="pongApp"
+    ng-controller="PongController as pong"
+    ng-keypress="pong.foo($event)">
+
+    <div id="pong-court" class="box">
+        <ball x="{{ball.x}}" y="{{ball.y}}" color="{{ball.color}}"></ball>
+        <paddle side="left" y="{{paddles.left.y}}"></paddle>
+        <span class="score left">{{scores.left}}</span>
+        <div id="net"></div>
+        <span class="score right">{{scores.right}}</span>
+        <paddle side="right" y="{{paddles.right.y}}"></paddle>
+    </div>
+    <!--
+    <div class="button-container">
+        <button class="btn btn-success" ng-click="serve()">Go</button>
+        <button class="btn btn-danger" ng-click="stopGame()">Stop</button>
+    </div>
+    -->
+
+</div>
+
+</body>
+</html>
+
