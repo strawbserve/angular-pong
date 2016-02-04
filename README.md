@@ -18,3 +18,4 @@ Still needs:
 - one player mode
   * unused paddle follows ball
   * handicap computer - max paddle speed?
+- add multiplayer with web sockets?
