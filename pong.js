@@ -25,6 +25,8 @@ angular.module('pongApp', [])
         right: 0
     };
     $scope.paddles = {
+        height: paddleHeight,
+        width: 20,
         left: {
             y: paddleMaxY/2,
             move: function(direction) {
@@ -37,8 +39,6 @@ angular.module('pongApp', [])
                 $scope.paddles.move('right', direction);
             }
         },
-        paddleHeight: paddleHeight,
-        paddleWidth: 20,
         move: function(side, direction) {
             if (angular.isDefined(intervals[side + direction])) return;
             var sign = ('up' == direction) ? -1 : 1; 
@@ -53,12 +53,12 @@ angular.module('pongApp', [])
             return this[side].y;
         },
         bottom: function(side) {
-            return this[side].y + this.paddleHeight;
+            return this[side].y + this.height;
         },
         face: function(side) {
-            var x = this.paddleWidth;
+            var x = this.width;
             if ('right' == side) {
-                x = box.clientWidth - this.paddleWidth;
+                x = box.clientWidth - this.width;
             }
             return x;
         }
@@ -92,7 +92,7 @@ angular.module('pongApp', [])
             var top = $scope.paddles.top(side);
             var bottom = $scope.paddles.bottom(side);
             var sign = ('left' == side) ? 1 : -1;
-            if (this.x * sign + face < $scope.paddles.paddleWidth) {
+            if (this.x * sign + face < $scope.paddles.width) {
                 if (top < this.y && this.y < bottom) {
                     return true;
                 }
@@ -306,8 +306,8 @@ angular.module('pongApp', [])
         restrict: 'E',
         link: function(scope, element, attrs) {
             element.addClass('paddle');
-            element.css('height', scope.paddles.paddleHeight + 'px');
-            element.css('width', scope.paddles.paddleWidth + 'px');
+            element.css('height', scope.paddles.height + 'px');
+            element.css('width', scope.paddles.width + 'px');
             if ('left' == attrs.side) {
                 element.css('float', 'left');
             }
