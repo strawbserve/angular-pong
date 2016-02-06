@@ -7,8 +7,8 @@ angular.module('pongApp', [])
     var box = angular.element(document.querySelector('#pong-court'));
     box = box[0];
 
-    var paddlePercent = 15;
-    var paddleHeight = Math.floor(box.clientHeight*paddlePercent/100);
+    var paddleHeightPercent = 15;
+    var paddleHeight = Math.floor(box.clientHeight*paddleHeightPercent/100);
     var paddleMaxY = box.clientHeight - paddleHeight;
     var keyMap = {
         13: 'serve',
@@ -25,25 +25,101 @@ angular.module('pongApp', [])
         right: 0
     };
     $scope.paddles = {
-        left: { y: paddleMaxY/2 },
-        right: { y: paddleMaxY/2 },
-        paddleHeight: paddleHeight
+        left: {
+            y: paddleMaxY/2,
+            move: function(direction) {
+                $scope.paddles.move('left', direction);
+            }
+        },
+        right: {
+            y: paddleMaxY/2,
+            move: function(direction) {
+                $scope.paddles.move('right', direction);
+            }
+        },
+        paddleHeight: paddleHeight,
+        paddleWidth: 20,
+        move: function(side, direction) {
+            if (angular.isDefined(intervals[side + direction])) return;
+            var sign = ('up' == direction) ? -1 : 1; 
+            intervals[side + direction] = $interval(function() {
+                // Note: This runs in the window scope because $interval().
+                if (1 == sign && paddleMaxY <= $scope.paddles[side].y) return;
+                if (-1 == sign && 0 >= $scope.paddles[side].y) return;
+                $scope.paddles[side].y += 3 * sign;
+            }, 5);
+        },
+        top: function(side) {
+            return this[side].y;
+        },
+        bottom: function(side) {
+            return this[side].y + this.paddleHeight;
+        },
+        face: function(side) {
+            var x = this.paddleWidth;
+            if ('right' == side) {
+                x = box.clientWidth - this.paddleWidth;
+            }
+            return x;
+        }
+
     };
     $scope.ball = {
+        height: 20,
+        width: 20,
         x: -50,
         y: Number(box.clientHeight/2),
         velocities: {
             x: 0,
             y: 0
         },
-        color: '#ccc'
+        color: '#ccc',
+        touchesTop: function() {
+            return this.y <= 0;
+        },
+        touchesBottom: function() {
+            return box.clientHeight <= this.y;
+        },
+        touchesLeft: function() {
+            return this.x < 0;
+        },
+        touchesRight: function() {
+            return box.clientWidth < this.x;
+        },
+        touchesPaddle: function() {
+            var side = this.direction();
+            var face = $scope.paddles.face(side);
+            var top = $scope.paddles.top(side);
+            var bottom = $scope.paddles.bottom(side);
+            var sign = ('left' == side) ? 1 : -1;
+            if (this.x * sign + face < $scope.paddles.paddleWidth) {
+                if (top < this.y && this.y < bottom) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        isOut: function() {
+            return this.touchesLeft() || this.touchesRight();
+        },
+        direction: function() {
+            var direction = 'left';
+            if (this.velocities.x < 0) { direction = 'right'; }
+            return direction;
+        },
+        setLastX: function() {
+            this.x = 1;
+            if (this.direction() == 'right') {
+                this.x = box.clientWidth - this.width;
+            }
+        }
     };
     intervals.ball = undefined;
     $scope.startGame = function() {
         $scope.ball.ts = undefined;
         if (angular.isDefined(intervals.ball)) return;
         intervals.ball = $interval(function() {
-            var max = {
+            var dimensions = {
                 x: box.clientWidth,
                 y: box.clientHeight
             };
@@ -52,51 +128,56 @@ angular.module('pongApp', [])
 
             $scope.ball.ts = now;
 
-            setBallPosition('x');
-            setBallPosition('y');
-            function setBallPosition(axis) {
+            updateBallPosition('x');
+            updateBallPosition('y');
+            function updateBallPosition(axis) {
                 var velocity = $scope.ball.velocities[axis]/1000;
                 $scope.ball[axis] += Math.floor(elapsed * velocity);
             }
 
-            setBallSpeed('x', $scope.ball.x);
-            setBallSpeed('y', $scope.ball.y);
-            function setBallSpeed(axis, value) {
-                var min = 1;
-                var side = 'right';
-                var otherSide = 'left';
-                if (0 < $scope.ball.velocities.x) {
-                    side = 'left';
-                    otherSide = 'right';
-                }
-                var sideY = $scope.paddles[side].y;
-                var ballY = $scope.ball.y;
-                var missed = (
-                    'x' == axis &&
-                    (
-                        sideY > ballY || 
-                        sideY + $scope.paddles.paddleHeight < ballY
-                    )
-                );
-                if ($scope.ball[axis] > max[axis]) {
-                    if (missed) { handleMiss(); } else { beep(axis) };
-                    $scope.ball[axis] = 2 * max[axis] - $scope.ball[axis];
+            updateBallDirection('x', $scope.ball.x);
+            updateBallDirection('y', $scope.ball.y);
+            function updateBallDirection(axis, value) {
+                function bounce(axis, magnitude) {
+                    var dimensions = {
+                        x: box.clientWidth,
+                        y: box.clientHeight
+                    };
+                    var min = 21;
+                    var max = dimensions[axis] - 20;
+                    if ('max' == magnitude) {
+                        $scope.ball[axis] = 2 * max - $scope.ball[axis];
+                    }
+                    if ('min' == magnitude) {
+                        $scope.ball[axis] = 1;
+                    }
                     $scope.ball.velocities[axis] *= -1;
-                }
-                if ($scope.ball[axis] < min) {
-                    if (missed) { handleMiss(); } else { beep(axis) };
-                    $scope.ball[axis] = min;
-                    $scope.ball.velocities[axis] *= -1;
-                }
-                function beep(axis) {
-                    if ('x' == axis) { paddleBeep.play(); }
                     if ('y' == axis) { wallBeep.play(); }
+                    if ('x' == axis) { paddleBeep.play(); }
                 }
-                function handleMiss() {
-                    $scope.scores[otherSide]++;
+                if ($scope.ball.touchesTop()) {
+                    bounce('y', 'min');
+                    return;
+                }
+                if ($scope.ball.touchesBottom()) {
+                    bounce('y', 'max');
+                    return;
+                }
+                if ($scope.ball.touchesPaddle()) {
+                    var magnitude = 'max';
+                    if ($scope.ball.direction() == 'left') {
+                        magnitude = 'min';
+                    }
+                    bounce('x', magnitude);
+                    return;
+                }
+                if ($scope.ball.isOut()) {
+                    $scope.sideOut = $scope.ball.direction();
+                    $scope.scores[$scope.otherSide($scope.sideOut)]++;
+                    $scope.ball.setLastX();
                     outBeep.play();
-                    $scope.sideOut = side;
                     $scope.stopGame();
+                    return;
                 }
             }
         }, 20);
@@ -108,28 +189,16 @@ angular.module('pongApp', [])
         }
     };
     $scope.leftUp = function() {
-        $scope.movePaddle('left', 'up');
+        $scope.paddles['left'].move('up');
     };
     $scope.leftDown = function() {
-        $scope.movePaddle('left', 'down');
+        $scope.paddles['left'].move('down');
     };
     $scope.rightUp = function() {
-        $scope.movePaddle('right', 'up');
+        $scope.paddles['right'].move('up');
     };
     $scope.rightDown = function() {
-        $scope.movePaddle('right', 'down');
-    };
-    $scope.movePaddle = function(side, direction) {
-        if (angular.isDefined(intervals[side + direction])) return;
-        var sign = 1; 
-        if ('up' == direction) {
-            sign = -1;
-        }
-        intervals[side + direction] = $interval(function() {
-            if (1 == sign && paddleMaxY <= $scope.paddles[side].y) return;
-            if (-1 == sign && 0 >= $scope.paddles[side].y) return;
-            $scope.paddles[side].y += 3 * sign;
-        }, 10);
+        $scope.paddles['right'].move('down');
     };
     $scope.serve = function() {
         var sign = 1;
@@ -179,6 +248,15 @@ angular.module('pongApp', [])
         var randNum = $scope.randomInt(1);
         return (randNum % 2) ? 1 : -1;
     };
+    $scope.otherSide = function(side) {
+        var other = {
+            left: 'right',
+            right: 'left'
+        }
+        if (undefined != other[side]) {
+            return other[side];
+        }
+    };
     angular.element(document).on('keydown', function(e) {
         if (angular.isFunction($scope[keyMap[e.keyCode]])) {
             $scope[keyMap[e.keyCode]]();
@@ -200,6 +278,8 @@ angular.module('pongApp', [])
         restrict: 'E',
         link: function(scope, element, attrs) {
             element.addClass('circle');
+            element.css('height', scope.ball.height);
+            element.css('width', scope.ball.width);
             scope.$watch(
                 function() { return attrs.x; },
                 function(x) {
@@ -227,6 +307,7 @@ angular.module('pongApp', [])
         link: function(scope, element, attrs) {
             element.addClass('paddle');
             element.css('height', scope.paddles.paddleHeight + 'px');
+            element.css('width', scope.paddles.paddleWidth + 'px');
             if ('left' == attrs.side) {
                 element.css('float', 'left');
             }

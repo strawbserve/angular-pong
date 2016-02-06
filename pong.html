@@ -8,10 +8,7 @@
 <link rel="stylesheet" type="text/css" href="pong.css">
 <body>
 
-<div id="app"
-    ng-app="pongApp"
-    ng-controller="PongController as pong"
-    ng-keypress="pong.foo($event)">
+<div id="app" ng-app="pongApp" ng-controller="PongController as pong">
 
     <div id="pong-court" class="box">
         <ball x="{{ball.x}}" y="{{ball.y}}" color="{{ball.color}}"></ball>
