@@ -12,7 +12,6 @@ Usage:
 Still needs:
 
 - impart velocity/direction to ball from paddle
-- better paddle intersect handling
 - expose settings
 - key capture module?
 - one player mode
