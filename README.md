@@ -11,7 +11,7 @@ Usage:
 
 Still needs:
 
-- impart velocity/direction to ball from paddle
+- serve from paddle position
 - expose settings
 - key capture module?
 - one player mode
