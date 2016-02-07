@@ -67,6 +67,9 @@ angular.module('pongApp', [])
             }
             return x;
         },
+        center: function(side) {
+            return this[side].y + (this.height/2);
+        },
         resetVelocity: function(side) {
             $scope.paddles[side].velocity = 0;
         }
@@ -232,12 +235,12 @@ angular.module('pongApp', [])
             $scope.sideOut = sides[Math.floor(Math.random()*10)%2];
         }
         $scope.ball.x = box.clientWidth;
-        $scope.ball.y = Math.floor(box.clientHeight)/2;
+        $scope.ball.y = $scope.paddles.center('right');
         $scope.ball.velocities.x = $scope.getRandomVelocity('x');
         $scope.ball.velocities.y = $scope.getRandomVelocity('y');
         if ('right' == $scope.sideOut) {
             $scope.ball.x = 1;
-            $scope.ball.y = Math.floor(box.clientHeight)/2 - 1;
+            $scope.ball.y = $scope.paddles.center('left');
             // make sure the ball is going the right direction
             if (0 <= $scope.ball.velocities.x) { sign = -1; }
             

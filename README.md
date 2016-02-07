@@ -11,7 +11,6 @@ Usage:
 
 Still needs:
 
-- serve from paddle position
 - expose settings
 - key capture module?
 - one player mode
