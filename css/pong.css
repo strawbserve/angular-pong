@@ -1,0 +1,51 @@
+html,body,#app {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    /*overflow: hidden;*/
+}
+.box {
+    background-color: #333;
+    height: 100%;
+    margin: 0;
+}
+.circle {
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #aaa;
+    /*border-radius: 50%;*/
+}
+#net {
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    height: 100%;
+    width: 1px;
+    border-left: 4px dashed #999;
+
+}
+.paddle {
+    display: block;
+    position: relative;
+    width: 15px;
+    height: 60px;
+    background-color: #ccc;
+}
+.button-container {
+    margin-left: 10px;
+}
+.score {
+    font-family: 'VT323';
+    color: #999;
+    font-weight: bold;
+    position: absolute;
+    font-size: 100px;
+}
+.score.left {
+    left: 40%;
+}
+.score.right {
+    right: 40%;
+}
