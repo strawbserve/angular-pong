@@ -1,5 +1,6 @@
 angular.module('pongApp', [])
 .controller('PongController', ['$scope', '$interval', function($scope, $interval) {
+
     var wallBeep = new Audio("pong_8bit_wall.wav");
     var paddleBeep = new Audio("pong_8bit_paddle.wav");
     var outBeep = new Audio("pong_8bit_out.wav");
@@ -10,13 +11,14 @@ angular.module('pongApp', [])
     var paddleHeightPercent = 15;
     var paddleHeight = Math.floor(box.clientHeight*paddleHeightPercent/100);
     var paddleMaxY = box.clientHeight - paddleHeight;
+
     var keyMap = {
-        13: 'serve',
-        27: 'stopGame',
-        87: 'leftUp',
-        83: 'leftDown',
-        38: 'rightUp',
-        40: 'rightDown'
+        13: 'serve',    // Enter
+        27: 'stopGame', // Esc
+        87: 'leftUp',   // w
+        83: 'leftDown', // s
+        38: 'rightUp',  // up arrow
+        40: 'rightDown' // down arrow
     };
     var intervals = {}
 
@@ -72,6 +74,21 @@ angular.module('pongApp', [])
         },
         resetVelocity: function(side) {
             $scope.paddles[side].velocity = 0;
+        },
+        auto: function(side) {
+            if ($scope.ball.x < box.clientHeight/2) {
+                var direction = ($scope.ball.y > this.center(side)) ? 'down' : 'up';
+                if ('up' == direction) {
+                    $scope.cancelInterval(side + 'down');
+                } else if ('down' == direction) {
+                    $scope.cancelInterval(side + 'up');
+                }
+                if ( ! angular.isDefined(intervals[side + direction]) ) {
+                    this.move(side, direction);
+                }
+            } else {
+                $interval.cancel(intervals[side + direction]);
+            }
         }
     };
     $scope.ball = {
@@ -121,7 +138,7 @@ angular.module('pongApp', [])
             if (this.velocities.x < 0) { direction = 'right'; }
             return direction;
         },
-        setLastX: function() {
+        setFinalX: function() {
             this.x = 1;
             if (this.direction() == 'right') {
                 this.x = box.clientWidth - this.width;
@@ -133,6 +150,7 @@ angular.module('pongApp', [])
         $scope.ball.ts = undefined;
         if (angular.isDefined(intervals.ball)) return;
         intervals.ball = $interval(function() {
+            $scope.paddles.auto('left');
             var dimensions = {
                 x: box.clientWidth,
                 y: box.clientHeight
@@ -190,7 +208,7 @@ angular.module('pongApp', [])
                 if ($scope.ball.isOut()) {
                     $scope.sideOut = $scope.ball.direction();
                     $scope.scores[$scope.otherSide($scope.sideOut)]++;
-                    $scope.ball.setLastX();
+                    $scope.ball.setFinalX();
                     outBeep.play();
                     $scope.stopGame();
                     return;
@@ -200,7 +218,7 @@ angular.module('pongApp', [])
     };
     $scope.stopGame = function() {
         if (angular.isDefined(intervals.ball)) {
-            $interval.cancel(intervals.ball);
+            $scope.cancelInterval('ball');
             intervals.ball = undefined;
         }
     };
@@ -285,6 +303,15 @@ angular.module('pongApp', [])
             return other[side];
         }
     };
+    $scope.cancelInterval = function(interval) {
+        if (angular.isDefined(interval) && undefined != intervals[interval]) {
+            $interval.cancel(intervals[interval]);
+            if (angular.isFunction($scope[interval + 'Cancel'])) {
+                $scope[interval + 'Cancel']();
+            }
+            intervals[interval] = undefined;
+        }
+    }
     angular.element(document).on('keydown', function(e) {
         if (angular.isFunction($scope[keyMap[e.keyCode]])) {
             $scope[keyMap[e.keyCode]]();
@@ -292,15 +319,7 @@ angular.module('pongApp', [])
     });
     angular.element(document).on('keyup', function(e) {
         if (angular.isFunction($scope[keyMap[e.keyCode]])) {
-            var interval = keyMap[e.keyCode].toLowerCase();
-            if (angular.isDefined(interval) && undefined != intervals[interval]) {
-                $interval.cancel(intervals[interval]);
-                if (angular.isFunction($scope[interval + 'Cancel'])) {
-                    $scope[interval + 'Cancel']();
-                }
-                intervals[interval] = undefined;
-            }
-            
+            $scope.cancelInterval(keyMap[e.keyCode].toLowerCase());
         }
     });
 }])
