@@ -17,3 +17,4 @@ Still needs:
   * unused paddle follows ball
   * handicap computer - max paddle speed?
 - add multiplayer with web sockets?
+- make it work on phones
