@@ -1,13 +1,10 @@
 angular.module('pongApp', ['ui.bootstrap'])
-.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items) {
+.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, settings) {
 
-    $scope.items = items;
-    $scope.selected = {
-        item: $scope.items[0]
-    };
+    $scope.settings = settings;
 
     $scope.ok = function () {
-        $uibModalInstance.close($scope.selected.item);
+        $uibModalInstance.close($scope.settings);
     };
 
     $scope.cancel = function () {
@@ -17,11 +14,17 @@ angular.module('pongApp', ['ui.bootstrap'])
 })
 .controller('PongController', ['$scope', '$interval', '$uibModal', function($scope, $interval, $uibModal) {
 
-    $scope.items = ['item1', 'item2', 'item3'];
+    // TODO: 1/0 true/false values come back from the HTML with quotes
+    // Find out how to pass them as Number or Boolean if possible.
+    // NOTE: In the mean time, they're initialized as strings and converted
+    // where they are used.
+    $scope.settings = {
+        soundOn: "1",
+    };
 
     $scope.animationsEnabled = true;
 
-    $scope.open = function (size) {
+    $scope.openModal = function (size) {
 
         var modalInstance = $uibModal.open({
             animation: $scope.animationsEnabled,
@@ -29,14 +32,14 @@ angular.module('pongApp', ['ui.bootstrap'])
             controller: 'ModalInstanceCtrl',
             size: size,
             resolve: {
-              items: function () {
-                return $scope.items;
+              settings: function () {
+                return $scope.settings;
               }
             }
         });
 
-        modalInstance.result.then(function (selectedItem) {
-            $scope.selected = selectedItem;
+        modalInstance.result.then(function (settings) {
+            $scope.settings = settings;
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
         });
@@ -48,9 +51,9 @@ angular.module('pongApp', ['ui.bootstrap'])
           $scope.animationsEnabled = !$scope.animationsEnabled;
     };
 
-    var wallBeep = new Audio("pong_8bit_wall.wav");
-    var paddleBeep = new Audio("pong_8bit_paddle.wav");
-    var outBeep = new Audio("pong_8bit_out.wav");
+    $scope.wallBeep = new Audio("pong_8bit_wall.wav");
+    $scope.paddleBeep = new Audio("pong_8bit_paddle.wav");
+    $scope.outBeep = new Audio("pong_8bit_out.wav");
 
     var box = angular.element(document.querySelector('#pong-court'));
     box = box[0];
@@ -69,6 +72,12 @@ angular.module('pongApp', ['ui.bootstrap'])
     };
     var intervals = {}
 
+    $scope.playSound = function(sound) {
+        if ( ! Number($scope.settings.soundOn) ) { return; }
+        if (undefined != $scope[sound]) {
+            $scope[sound].play();
+        }
+    };
     $scope.scores = {
         left: 0,
         right: 0
@@ -231,8 +240,8 @@ angular.module('pongApp', ['ui.bootstrap'])
                         $scope.ball[axis] = 1;
                     }
                     $scope.ball.velocities[axis] *= -1;
-                    if ('y' == axis) { wallBeep.play(); }
-                    if ('x' == axis) { paddleBeep.play(); }
+                    if ('y' == axis) { $scope.playSound('wallBeep'); }
+                    if ('x' == axis) { $scope.playSound('paddleBeep'); }
                 }
                 if ($scope.ball.touchesTop()) {
                     bounce('y', 'min');
@@ -256,7 +265,7 @@ angular.module('pongApp', ['ui.bootstrap'])
                     $scope.sideOut = $scope.ball.direction();
                     $scope.scores[$scope.otherSide($scope.sideOut)]++;
                     $scope.ball.setFinalX();
-                    outBeep.play();
+                    $scope.playSound('outBeep');
                     $scope.stopGame();
                     return;
                 }
@@ -268,17 +277,24 @@ angular.module('pongApp', ['ui.bootstrap'])
         $scope.toggleModal();
     };
     $scope.toggleModal = function() {
-        if (undefined == $scope.modal) {
-            $scope.open()
+        if ($scope.modalIsOpen()) {
+            $scope.modal.close();
         }
         else {
-            // not comfy with this; why no accessor?
+            $scope.openModal();
+        }
+    };
+    // This function encapsulates the reach into $scope.modal.closed
+    // since there's no accessor for $$state.status. TODO: Hopefully
+    // a better way to determine the open/closed state will turn up.
+    $scope.modalIsOpen = function() {
+        var isOpen = false;
+        if (undefined != $scope.modal) {
             if ( ! $scope.modal.closed.$$state.status ) {
-                $scope.modal.close();
-            } else {
-                $scope.open();
+                isOpen = true;
             }
         }
+        return isOpen;
     };
     $scope.stopGame = function() {
         if (angular.isDefined(intervals.ball)) {

@@ -49,3 +49,6 @@ html,body,#app {
 .score.right {
     right: 40%;
 }
+input.radio-right {
+    margin-left: 10px;
+}

@@ -30,14 +30,23 @@
             <h3 class="modal-title">Settings</h3>
         </div>
         <div class="modal-body">
-                <input name="sound" type="checkbox" ng-model="soundOn" />
-                <label for="sound">Make noise</label>
-            <ul>
-                <li ng-repeat="item in items">
-                    <a href="#" ng-click="$event.preventDefault(); selected.item = item">{{ item }}</a>
-                </li>
-            </ul>
-            Selected: <b>{{ selected.item }}</b>
+            <form>
+                <fieldset>
+                <legend>Sound</legend>
+                <input type="radio"
+                       name="soundOn"
+                       value="1"
+                       ng-model="settings.soundOn"
+                       class="radio-left">
+                <label for="soundOn">On</label>
+                <input type="radio"
+                       name="soundOn"
+                       value="0"
+                       ng-model="settings.soundOn"
+                       class="radio-right">
+                <label for="soundOn">Off</label>
+                </fieldset>
+            </form>
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
@@ -49,7 +58,6 @@
     <button type="button" class="btn btn-default" ng-click="open('lg')">Large modal</button>
     <button type="button" class="btn btn-default" ng-click="open('sm')">Small modal</button>
     <button type="button" class="btn btn-default" ng-click="toggleAnimation()">Toggle Animation ({{ animationsEnabled }})</button>
-    <div ng-show="selected">Selection from a modal: {{ selected }}</div>
 
 
 </div>
