@@ -3,6 +3,10 @@ angular.module('pongApp', ['ui.bootstrap'])
 
     $scope.settings = settings;
 
+    $scope.$on('modalOkay', function(event, arg) {
+        $scope.ok();
+    });
+
     $scope.ok = function () {
         $uibModalInstance.close($scope.settings);
     };
@@ -12,10 +16,10 @@ angular.module('pongApp', ['ui.bootstrap'])
     };
 
 })
-.controller('PongController', ['$scope', '$interval', '$uibModal', function($scope, $interval, $uibModal) {
+.controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', function($rootScope, $scope, $interval, $uibModal) {
 
-    // TODO: 1/0 true/false values come back from the HTML with quotes
-    // Find out how to pass them as Number or Boolean if possible.
+    // TODO: 1/0 true/false values come back from the HTML with quotes. Find
+    // out how to pass them as Number or Boolean if possible.
     // NOTE: In the mean time, they're initialized as strings and converted
     // where they are used.
     $scope.settings = {
@@ -33,7 +37,11 @@ angular.module('pongApp', ['ui.bootstrap'])
             size: size,
             resolve: {
               settings: function () {
-                return $scope.settings;
+                // NOTE: Using JSON.parse(JSON.stringify()) forces pass
+                // by value. If $scope.settings is passed un-copied the
+                // values change as soon as they change in the modal so
+                // the submit step isn't needed (cancel doesn't work). 
+                return JSON.parse(JSON.stringify($scope.settings));
               }
             }
         });
@@ -63,7 +71,7 @@ angular.module('pongApp', ['ui.bootstrap'])
     var paddleMaxY = box.clientHeight - paddleHeight;
 
     var keyMap = {
-        13: 'serve',    // Enter
+        13: 'handleEnter',
         27: 'handleEsc',
         87: 'leftUp',   // w
         83: 'leftDown', // s
@@ -271,6 +279,13 @@ angular.module('pongApp', ['ui.bootstrap'])
                 }
             }
         }, 20);
+    };
+    $scope.handleEnter = function() {
+        if ($scope.modalIsOpen()) {
+            $rootScope.$broadcast('modalOkay', '');
+            return;
+        }
+        $scope.serve();
     };
     $scope.handleEsc = function() {
         $scope.stopGame();
