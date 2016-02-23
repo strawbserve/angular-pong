@@ -15,6 +15,7 @@ NOTES:
 
 TODO:
 
+- download angular and bootstrap files and get off CDNs
 - key capture module?
 - one player mode: work on better algorithm
 - add multiplayer with web sockets?
