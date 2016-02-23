@@ -22,3 +22,7 @@ TODO:
 - one player mode: work on better algorithm
 - add multiplayer with web sockets?
 - make it work on phones
+- settings:
+  - "play to" score (acknowledge winner?)
+  - choose computer player side
+  - save settings?
