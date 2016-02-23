@@ -1,6 +1,10 @@
 # angular-pong
 ## Pong in AngularJS
 
+I wanted to play with AngularJS without having a "useyness" agenda (i.e. doing something that I might regret not finishing) and thought it might be fun to implement Pong.
+
+If anybody has copyright issues with this let me know and I will cease and desist immediately.
+
 Needed some AngularJS practice and thought it would be fun to implement Pong. So far it's messy but it kind of works. Just jotting notes in the README for now.
 
 Usage:
