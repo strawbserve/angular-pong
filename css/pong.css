@@ -2,7 +2,7 @@ html,body,#app {
     margin: 0;
     padding: 0;
     height: 100%;
-    /*overflow: hidden;*/
+    overflow: hidden;
 }
 .box {
     background-color: #333;
@@ -43,12 +43,28 @@ html,body,#app {
     position: absolute;
     font-size: 100px;
 }
+span.key-icon {
+    border: 1px solid #ccc;
+    background-color: #eee;
+    padding: 3px;
+    border-radius: 3px;
+}
+span.key-icon.arrow {
+    padding: 0px 5px 1px 5px;
+}
 .score.left {
     left: 40%;
 }
 .score.right {
     right: 40%;
 }
+input.radio-left {
+    margin-left: 20px;
+}
 input.radio-right {
     margin-left: 10px;
+}
+input.text-paddle-speed {
+    width: 3em;
+    text-align: center;
 }

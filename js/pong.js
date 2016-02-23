@@ -18,12 +18,10 @@ angular.module('pongApp', ['ui.bootstrap'])
 })
 .controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', function($rootScope, $scope, $interval, $uibModal) {
 
-    // TODO: 1/0 true/false values come back from the HTML with quotes. Find
-    // out how to pass them as Number or Boolean if possible.
-    // NOTE: In the mean time, they're initialized as strings and converted
-    // where they are used.
     $scope.settings = {
-        soundOn: "1",
+        numPlayers: 1,
+        soundOn: 1,
+        paddleSpeed: 50
     };
 
     $scope.animationsEnabled = true;
@@ -54,6 +52,7 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         $scope.modal = modalInstance;;
     };
+    $scope.openModal();
 
     $scope.toggleAnimation = function () {
           $scope.animationsEnabled = !$scope.animationsEnabled;
@@ -81,7 +80,7 @@ angular.module('pongApp', ['ui.bootstrap'])
     var intervals = {}
 
     $scope.playSound = function(sound) {
-        if ( ! Number($scope.settings.soundOn) ) { return; }
+        if (0 == $scope.settings.soundOn ) { return; }
         if (undefined != $scope[sound]) {
             $scope[sound].play();
         }
@@ -115,7 +114,7 @@ angular.module('pongApp', ['ui.bootstrap'])
                 // Note: This runs in the window scope because $interval().
                 if (1 == sign && paddleMaxY <= $scope.paddles[side].y) return;
                 if (-1 == sign && 0 >= $scope.paddles[side].y) return;
-                $scope.paddles[side].y += 3 * sign;
+                $scope.paddles[side].y += ($scope.settings.paddleSpeed/10) * sign;
                 $scope.paddles[side].velocity++;
                 $scope.paddles[side].direction = direction;
             }, 5);
@@ -214,7 +213,9 @@ angular.module('pongApp', ['ui.bootstrap'])
         $scope.ball.ts = undefined;
         if (angular.isDefined(intervals.ball)) return;
         intervals.ball = $interval(function() {
-            $scope.paddles.auto('left');
+            if ($scope.settings.numPlayers == 1) {
+                $scope.paddles.auto('left');
+            }
             var dimensions = {
                 x: box.clientWidth,
                 y: box.clientHeight

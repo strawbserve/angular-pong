@@ -19,33 +19,57 @@
         <span class="score right">{{scores.right}}</span>
         <paddle side="right" y="{{paddles.right.y}}"></paddle>
     </div>
-    <!--
-    <div class="button-container">
-        <button class="btn btn-success" ng-click="serve()">Go</button>
-        <button class="btn btn-danger" ng-click="stopGame()">Stop</button>
-    </div>
-    -->
     <script type="text/ng-template" id="myModalContent.html">
         <div class="modal-header">
-            <h3 class="modal-title">Settings</h3>
+            <h3 class="modal-title">Angular Pong</h3>
+            <h4>Instructions</h4>
+            <p><span class="key-icon">Esc</span> - stops the game and opens this screen or cancels changes and exits this screen.</p>
+            <p><span class="key-icon">Enter</span> - serves the ball or submits changes and exits this screen.</p>
+            <p>Paddles currently only move via keys:
+            <ul>
+                <li>Left: <span class="key-icon">w</span> and <span class="key-icon">s</span></li>
+                <li>Right: <span class="key-icon arrow">&uarr;</span> and <span class="key-icon arrow">&darr;</span></li>
+            </ul>
+            </p>
+            <p>Use the form below to fiddle with available customizations. (Settings are not currently saved between games.)</p>
         </div>
         <div class="modal-body">
             <form>
-                <fieldset>
-                <legend>Sound</legend>
-                <input type="radio"
-                       name="soundOn"
-                       value="1"
-                       ng-model="settings.soundOn"
-                       class="radio-left">
-                <label for="soundOn">On</label>
-                <input type="radio"
-                       name="soundOn"
-                       value="0"
-                       ng-model="settings.soundOn"
-                       class="radio-right">
-                <label for="soundOn">Off</label>
-                </fieldset>
+                <p>
+                <label>Players</label>
+                    <input type="radio"
+                           name="numPlayers"
+                           value="1"
+                           ng-model="settings.numPlayers"
+                           class="radio-left">
+                    <label for="numPlayers">1</label>
+                    <input type="radio"
+                           name="numPlayers"
+                           value="2"
+                           ng-model="settings.numPlayers"
+                           class="radio-right">
+                    <label for="numPlayers">2</label>
+                </p>
+                <p>
+                    <label>Sound</label>
+                    <input type="radio"
+                           name="soundOn"
+                           value="1"
+                           ng-model="settings.soundOn"
+                           class="radio-left">
+                    <label for="soundOn">On</label>
+                    <input type="radio"
+                           name="soundOn"
+                           value="0"
+                           ng-model="settings.soundOn"
+                           class="radio-right">
+                    <label for="soundOn">Off</label>
+                </p>
+                <p>
+                    <label for="paddleSpeed">Paddle Speed</label>
+                    <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed">
+                    <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%">
+                </p>
             </form>
         </div>
         <div class="modal-footer">
@@ -53,12 +77,6 @@
             <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
         </div>
     </script>
-
-    <button type="button" class="btn btn-default" ng-click="open()">Open me!</button>
-    <button type="button" class="btn btn-default" ng-click="open('lg')">Large modal</button>
-    <button type="button" class="btn btn-default" ng-click="open('sm')">Small modal</button>
-    <button type="button" class="btn btn-default" ng-click="toggleAnimation()">Toggle Animation ({{ animationsEnabled }})</button>
-
 
 </div>
 
