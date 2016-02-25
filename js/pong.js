@@ -18,11 +18,14 @@ angular.module('pongApp', ['ui.bootstrap'])
 })
 .controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', function($rootScope, $scope, $interval, $uibModal) {
 
-    $scope.settings = {
-        numPlayers: 1,
-        soundOn: 1,
-        paddleSpeed: 50
-    };
+    $scope.settings = JSON.parse(localStorage.getItem('settings'));
+    if (null == $scope.settings) {
+        $scope.settings = {
+            numPlayers: 1,
+            soundOn: 1,
+            paddleSpeed: 50
+        };
+    }
 
     $scope.animationsEnabled = true;
 
@@ -46,6 +49,7 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         modalInstance.result.then(function (settings) {
             $scope.settings = settings;
+            localStorage.setItem('settings', JSON.stringify(settings));
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
         });
