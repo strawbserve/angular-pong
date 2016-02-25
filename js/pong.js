@@ -22,6 +22,7 @@ angular.module('pongApp', ['ui.bootstrap'])
     if (null == $scope.settings) {
         $scope.settings = {
             numPlayers: 1,
+            autoSide: 'left',
             soundOn: 1,
             paddleSpeed: 50
         };
@@ -143,7 +144,10 @@ angular.module('pongApp', ['ui.bootstrap'])
             $scope.paddles[side].velocity = 0;
         },
         auto: function(side) {
-            if ($scope.ball.x < box.clientHeight/2) {
+            if (
+                $scope.ball.x < box.clientHeight/2 && 'left' == side ||
+                $scope.ball.x > box.clientHeight/2 && 'right' == side
+            ) {
                 var direction = ($scope.ball.y > this.center(side)) ? 'down' : 'up';
                 if ('up' == direction) {
                     $scope.cancelInterval(side + 'down');
@@ -218,7 +222,7 @@ angular.module('pongApp', ['ui.bootstrap'])
         if (angular.isDefined(intervals.ball)) return;
         intervals.ball = $interval(function() {
             if ($scope.settings.numPlayers == 1) {
-                $scope.paddles.auto('left');
+                $scope.paddles.auto($scope.settings.autoSide);
             }
             var dimensions = {
                 x: box.clientWidth,

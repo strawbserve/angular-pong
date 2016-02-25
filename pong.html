@@ -66,6 +66,20 @@
                     <label for="soundOn">Off</label>
                 </p>
                 <p>
+                    <label>Auto Side</label>
+                    <input type="radio"
+                           name="autoSide"
+                           value="left"
+                           ng-model="settings.autoSide"
+                           class="radio-left">
+                    <label for="autoSide">Left</label>
+                    <input type="radio"
+                           name="autoSide"
+                           value="right"
+                           ng-model="settings.autoSide"
+                           class="radio-right">
+                    <label for="autoSide">Right</label>
+                <p>
                     <label for="paddleSpeed">Paddle Speed</label>
                     <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed">
                     <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%">
