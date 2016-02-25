@@ -5,11 +5,11 @@ I wanted to play with AngularJS without having a "useyness" agenda (i.e. doing s
 
 Try it out here: http://www.byager.com/angular-pong/pong.html
 
-The computer player in one-player mode is still jittery. It should be beatable but that may vary depending on the host computer's performance. I put off working on the computer player algorithm because it was eating time and my goal is to learn to do things "the angular way". I have some ideas but none of them are really AngularJS specific. I'll get to it when I get to it. Feel free to contribute one. :)
-
-The next major goal is to work more on modularity to get used to fitting re-usable pieces together. 
-
 <sub>\* If I'm stepping on anybody's intellectual property toes with this let me know and I will cease and desist immediately.</sub>
+
+BUGS:
+- Paddles stop working on larger displays
+- The computer player in one-player mode is still jittery. It should be beatable but that may vary depending on the host computer's performance. I put off working on the computer player algorithm because it was eating time and my goal is to learn to do things "the angular way". I have some ideas but none of them are really AngularJS specific. I'll get to it when I get to it. Feel free to contribute one. :)
 
 NOTES:
 
