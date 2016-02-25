@@ -24,5 +24,4 @@ TODO:
 - make it work on phones
 - settings:
   - "play to" score (acknowledge winner?)
-  - choose computer player side
-  - save settings?
+  - set control keys
