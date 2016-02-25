@@ -81,8 +81,12 @@
                     <label for="autoSide">Right</label>
                 <p>
                     <label for="paddleSpeed">Paddle Speed</label>
-                    <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed">
+                    <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed"/>
                     <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%">
+                    <div class="float-right">
+                        <input type="checkbox"/ ng-model="settings.showDirections"/>
+                        <label for="showDirections">Show this dialog on load</label>
+                    </div>
                 </p>
             </form>
         </div>

@@ -24,7 +24,8 @@ angular.module('pongApp', ['ui.bootstrap'])
             numPlayers: 1,
             autoSide: 'left',
             soundOn: 1,
-            paddleSpeed: 50
+            paddleSpeed: 50,
+            showDirections: true
         };
     }
 
@@ -57,7 +58,9 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         $scope.modal = modalInstance;;
     };
-    $scope.openModal();
+    if ($scope.settings.showDirections) {
+        $scope.openModal();
+    }
 
     $scope.toggleAnimation = function () {
           $scope.animationsEnabled = !$scope.animationsEnabled;

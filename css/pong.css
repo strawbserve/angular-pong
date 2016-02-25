@@ -4,6 +4,9 @@ html,body,#app {
     height: 100%;
     overflow: hidden;
 }
+.float-right {
+    float: right;
+}
 .box {
     background-color: #333;
     height: 100%;
