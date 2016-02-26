@@ -10,9 +10,10 @@ angular.module('pongApp', ['ui.bootstrap'])
                 showDirections: true
             },
             active: false,
+            localStorageId: 'angular-pong.settings',
             get: function(setting) {
                 if (false === this.active) {
-                    this.active = JSON.parse(localStorage.getItem('settings'));
+                    this.active = JSON.parse(localStorage.getItem(this.localStorageId));
                     if (null == this.active) {
                         this.active = this.default;
                     }
@@ -25,14 +26,14 @@ angular.module('pongApp', ['ui.bootstrap'])
             },
             save: function(settings) {
                 this.active = settings;
-                localStorage.setItem('settings', JSON.stringify(settings));
+                localStorage.setItem(this.localStorageId, JSON.stringify(settings));
             },
             reset: function() {
                 this.active = this.default;
                 this.save(this.active);
             },
             clearLocal: function() {
-                localStorage.removeItem('settings');
+                localStorage.removeItem(this.localStorageId);
             }
         }
     }
