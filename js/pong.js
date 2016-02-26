@@ -1,33 +1,72 @@
 angular.module('pongApp', ['ui.bootstrap'])
-.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, settings) {
+.factory('Data', function() {
+    return {
+        settings: {
+            default: {
+                numPlayers: 1,
+                autoSide: 'left',
+                soundOn: 1,
+                paddleSpeed: 50,
+                showDirections: true
+            },
+            active: false,
+            get: function(setting) {
+                if (false === this.active) {
+                    this.active = JSON.parse(localStorage.getItem('settings'));
+                    if (null == this.active) {
+                        this.active = this.default;
+                    }
+                }
+                if (undefined != setting) {
+                    return this.active[setting];
+                } else {
+                    return this.active;
+                }
+            },
+            save: function(settings) {
+                this.active = settings;
+                localStorage.setItem('settings', JSON.stringify(settings));
+            },
+            reset: function() {
+                this.active = this.default;
+                this.save(this.active);
+            },
+            clearLocal: function() {
+                localStorage.removeItem('settings');
+            }
+        }
+    }
+})
+.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, Data) {
 
-    $scope.settings = settings;
+    // The JSON calls get us a copy of the settings so we can cancel.
+    $scope.settings = JSON.parse(JSON.stringify(Data.settings.get()));
 
     $scope.$on('modalOkay', function(event, arg) {
         $scope.ok();
     });
 
-    $scope.ok = function () {
+    $scope.clearLocal = function() {
+        Data.settings.clearLocal();
+    };
+
+    $scope.resetSettings = function() {
+        Data.settings.reset();
+        $scope.settings = Data.settings.get();
+    };
+
+    $scope.ok = function() {
         $uibModalInstance.close($scope.settings);
     };
 
-    $scope.cancel = function () {
+    $scope.cancel = function() {
         $uibModalInstance.dismiss('cancel');
     };
 
 })
-.controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', function($rootScope, $scope, $interval, $uibModal) {
+.controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', 'Data', function($rootScope, $scope, $interval, $uibModal, Data) {
 
-    $scope.settings = JSON.parse(localStorage.getItem('settings'));
-    if (null == $scope.settings) {
-        $scope.settings = {
-            numPlayers: 1,
-            autoSide: 'left',
-            soundOn: 1,
-            paddleSpeed: 50,
-            showDirections: true
-        };
-    }
+    $scope.settings = Data.settings.get();
 
     $scope.animationsEnabled = true;
 
@@ -37,21 +76,12 @@ angular.module('pongApp', ['ui.bootstrap'])
             animation: $scope.animationsEnabled,
             templateUrl: 'myModalContent.html',
             controller: 'ModalInstanceCtrl',
-            size: size,
-            resolve: {
-              settings: function () {
-                // NOTE: Using JSON.parse(JSON.stringify()) forces pass
-                // by value. If $scope.settings is passed un-copied the
-                // values change as soon as they change in the modal so
-                // the submit step isn't needed (cancel doesn't work). 
-                return JSON.parse(JSON.stringify($scope.settings));
-              }
-            }
+            size: size
         });
 
         modalInstance.result.then(function (settings) {
             $scope.settings = settings;
-            localStorage.setItem('settings', JSON.stringify(settings));
+            Data.settings.save(settings);
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
         });
