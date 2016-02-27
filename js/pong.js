@@ -65,7 +65,7 @@ angular.module('pongApp', ['ui.bootstrap'])
     };
 
 })
-.controller('PongController', ['$rootScope', '$scope', '$interval', '$uibModal', 'Data', function($rootScope, $scope, $interval, $uibModal, Data) {
+.controller('PongController', ['$rootScope', '$scope', '$window', '$interval', '$uibModal', 'Data', function($rootScope, $scope, $window, $interval, $uibModal, Data) {
 
     $scope.settings = Data.settings.get();
 
@@ -101,12 +101,12 @@ angular.module('pongApp', ['ui.bootstrap'])
     $scope.paddleBeep = new Audio("pong_8bit_paddle.wav");
     $scope.outBeep = new Audio("pong_8bit_out.wav");
 
-    var box = angular.element(document.querySelector('#pong-court'));
-    box = box[0];
+    var windowHeight = $window.innerHeight;
+    var windowWidth = $window.innerWidth;
 
     var paddleHeightPercent = 15;
-    var paddleHeight = Math.floor(box.clientHeight*paddleHeightPercent/100);
-    var paddleMaxY = box.clientHeight - paddleHeight;
+    var paddleHeight = Math.floor(windowHeight*paddleHeightPercent/100);
+    var paddleMaxY = windowHeight - paddleHeight;
 
     var keyMap = {
         13: 'handleEnter',
@@ -167,7 +167,7 @@ angular.module('pongApp', ['ui.bootstrap'])
         face: function(side) {
             var x = this.width;
             if ('right' == side) {
-                x = box.clientWidth - this.width;
+                x = windowWidth - this.width;
             }
             return x;
         },
@@ -179,8 +179,8 @@ angular.module('pongApp', ['ui.bootstrap'])
         },
         auto: function(side) {
             if (
-                $scope.ball.x < box.clientHeight/2 && 'left' == side ||
-                $scope.ball.x > box.clientHeight/2 && 'right' == side
+                $scope.ball.x < windowHeight/2 && 'left' == side ||
+                $scope.ball.x > windowHeight/2 && 'right' == side
             ) {
                 var direction = ($scope.ball.y > this.center(side)) ? 'down' : 'up';
                 if ('up' == direction) {
@@ -200,7 +200,7 @@ angular.module('pongApp', ['ui.bootstrap'])
         height: 20,
         width: 20,
         x: -50,
-        y: Number(box.clientHeight/2),
+        y: Number(windowHeight/2),
         velocities: {
             x: 0,
             y: 0
@@ -210,13 +210,13 @@ angular.module('pongApp', ['ui.bootstrap'])
             return this.y <= 0;
         },
         touchesBottom: function() {
-            return box.clientHeight <= this.y;
+            return windowHeight <= this.y;
         },
         touchesLeft: function() {
             return this.x < 0;
         },
         touchesRight: function() {
-            return box.clientWidth < this.x;
+            return windowWidth < this.x;
         },
         touchesPaddle: function() {
             var side = this.direction();
@@ -246,7 +246,7 @@ angular.module('pongApp', ['ui.bootstrap'])
         setFinalX: function() {
             this.x = 1;
             if (this.direction() == 'right') {
-                this.x = box.clientWidth - this.width;
+                this.x = windowWidth - this.width;
             }
         }
     };
@@ -259,8 +259,8 @@ angular.module('pongApp', ['ui.bootstrap'])
                 $scope.paddles.auto($scope.settings.autoSide);
             }
             var dimensions = {
-                x: box.clientWidth,
-                y: box.clientHeight
+                x: windowWidth,
+                y: windowHeight
             };
             var now = new Date().getTime();
             var elapsed = ($scope.ball.ts || now) - now;
@@ -279,8 +279,8 @@ angular.module('pongApp', ['ui.bootstrap'])
             function updateBallDirection(axis, value) {
                 function bounce(axis, magnitude) {
                     var dimensions = {
-                        x: box.clientWidth,
-                        y: box.clientHeight
+                        x: windowWidth,
+                        y: windowHeight
                     };
                     var min = 21;
                     var max = dimensions[axis] - 20;
@@ -390,7 +390,7 @@ angular.module('pongApp', ['ui.bootstrap'])
             var sides = ['left', 'right'];
             $scope.sideOut = sides[Math.floor(Math.random()*10)%2];
         }
-        $scope.ball.x = box.clientWidth;
+        $scope.ball.x = windowWidth;
         $scope.ball.y = $scope.paddles.center('right');
         $scope.ball.velocities.x = $scope.getRandomVelocity('x');
         $scope.ball.velocities.y = $scope.getRandomVelocity('y');
@@ -409,13 +409,12 @@ angular.module('pongApp', ['ui.bootstrap'])
         $scope.startGame();
     };
     $scope.getRandomVelocity = function(axis) {
-        var dimension = 'Height';
+        var side = windowHeight;
         var precision = 3;
         if ('x' == axis) {
-            dimension = 'Width';
+            side = windowWidth;
             precision = 2;
         }
-        var side = box['client' + dimension];
         var halfSide = side/2;
         var sign = $scope.randomSign();
         var rand = $scope.randomInt(precision);
