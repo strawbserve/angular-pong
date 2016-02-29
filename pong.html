@@ -36,6 +36,20 @@
         <div class="modal-body">
             <form>
                 <p>
+                    <label>Sound</label>
+                    <input type="radio"
+                           name="soundOn"
+                           value="1"
+                           ng-model="settings.soundOn"
+                           class="radio-left">
+                    <label for="soundOn">On</label>
+                    <input type="radio"
+                           name="soundOn"
+                           value="0"
+                           ng-model="settings.soundOn"
+                           class="radio-right">
+                    <label for="soundOn">Off</label>
+                </p>
                 <label>Players</label>
                     <input type="radio"
                            name="numPlayers"
@@ -51,20 +65,6 @@
                     <label for="numPlayers">2</label>
                 </p>
                 <p>
-                    <label>Sound</label>
-                    <input type="radio"
-                           name="soundOn"
-                           value="1"
-                           ng-model="settings.soundOn"
-                           class="radio-left">
-                    <label for="soundOn">On</label>
-                    <input type="radio"
-                           name="soundOn"
-                           value="0"
-                           ng-model="settings.soundOn"
-                           class="radio-right">
-                    <label for="soundOn">Off</label>
-                </p>
                 <p>
                     <label>Auto Side</label>
                     <input type="radio"
@@ -77,7 +77,8 @@
                            name="autoSide"
                            value="right"
                            ng-model="settings.autoSide"
-                           class="radio-right">
+                           class="radio-right"
+                           ng-disabled="2 == settings.numPlayers">
                     <label for="autoSide">Right</label>
                 </p>
                 <p>
