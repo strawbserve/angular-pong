@@ -21,8 +21,13 @@ TODO:
   - key capture module?
 - download angular and bootstrap files and get off CDNs
 - one player mode: work on better algorithm
+- add left serve key
 - add multiplayer with web sockets?
 - make it work on phones
+- form/validation
+  - min/max on paddle speed input
+  - grey out 'auto side' for 2 player mode
 - settings:
   - "play to" score (acknowledge winner?)
   - set control keys
+  - color selectors for background/ball/paddles
