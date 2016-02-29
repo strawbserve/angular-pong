@@ -11,7 +11,7 @@
 
 <div id="app" ng-app="pongApp" ng-controller="PongController as pong">
 
-    <div id="pong-court" class="box">
+    <div class="box" court>
         <ball x="{{ball.x}}" y="{{ball.y}}" color="{{ball.color}}"></ball>
         <paddle side="left" y="{{paddles.left.y}}"></paddle>
         <span class="score left">{{scores.left}}</span>
@@ -79,6 +79,15 @@
                            ng-model="settings.autoSide"
                            class="radio-right">
                     <label for="autoSide">Right</label>
+                </p>
+                <p>
+                    <label for="courtColor">Court color </label>
+                    <input type="color" ng-model="settings.courtColor" />
+                    <label for="paddleColor">Paddle color </label>
+                    <input type="color" ng-model="settings.paddleColor" />
+                    <label for="ballColor">Ball color </label>
+                    <input type="color" ng-model="settings.ballColor" />
+                </p>
                 <p>
                     <label for="paddleSpeed">Paddle Speed</label>
                     <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed"/>

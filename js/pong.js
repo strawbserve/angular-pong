@@ -7,6 +7,9 @@ angular.module('pongApp', ['ui.bootstrap'])
                 autoSide: 'left',
                 soundOn: 1,
                 paddleSpeed: 50,
+                courtColor: '#333333',
+                paddleColor: '#cccccc',
+                ballColor: '#cccccc',
                 showDirections: true
             },
             active: false,
@@ -82,6 +85,7 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         modalInstance.result.then(function (settings) {
             $scope.settings = settings;
+console.log($scope.settings.courtColor);
             Data.settings.save(settings);
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
@@ -93,13 +97,11 @@ angular.module('pongApp', ['ui.bootstrap'])
         $scope.openModal();
     }
 
+/*
     $scope.toggleAnimation = function () {
           $scope.animationsEnabled = !$scope.animationsEnabled;
     };
-
-    $scope.wallBeep = new Audio("pong_8bit_wall.wav");
-    $scope.paddleBeep = new Audio("pong_8bit_paddle.wav");
-    $scope.outBeep = new Audio("pong_8bit_out.wav");
+*/
 
     var windowHeight = $window.innerHeight;
     var windowWidth = $window.innerWidth;
@@ -117,6 +119,10 @@ angular.module('pongApp', ['ui.bootstrap'])
         40: 'rightDown' // down arrow
     };
     var intervals = {}
+
+    $scope.wallBeep = new Audio("pong_8bit_wall.wav");
+    $scope.paddleBeep = new Audio("pong_8bit_paddle.wav");
+    $scope.outBeep = new Audio("pong_8bit_out.wav");
 
     $scope.playSound = function(sound) {
         if (0 == $scope.settings.soundOn ) { return; }
@@ -448,7 +454,7 @@ angular.module('pongApp', ['ui.bootstrap'])
             }
             intervals[interval] = undefined;
         }
-    }
+    };
     angular.element(document).on('keydown', function(e) {
         if (angular.isFunction($scope[keyMap[e.keyCode]])) {
             $scope[keyMap[e.keyCode]]();
@@ -460,6 +466,19 @@ angular.module('pongApp', ['ui.bootstrap'])
         }
     });
 }])
+.directive('court', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            scope.$watch(
+                function() { return scope.settings.courtColor; },
+                function() {
+                    element.css('background-color', scope.settings.courtColor);
+                }
+            );
+        }
+    };
+})
 .directive('ball', function() {
     return {
         restrict: 'E',
@@ -480,9 +499,12 @@ angular.module('pongApp', ['ui.bootstrap'])
                 }
             );
             scope.$watch(
-                function() { return attrs.color; },
+                function() { return scope.settings.ballColor; },
                 function(color) {
-                    element.css('background-color', color);
+                    element.css(
+                        'background-color',
+                        scope.settings.ballColor
+                    );
                 }
             );
         }
@@ -505,6 +527,15 @@ angular.module('pongApp', ['ui.bootstrap'])
                 function() { return attrs.y; },
                 function(y) {
                     element.css('top', y + 'px');
+                }
+            );
+            scope.$watch(
+                function() { return scope.settings.paddleColor; },
+                function() {
+                    element.css(
+                        'background-color',
+                        scope.settings.paddleColor
+                    );
                 }
             );
         }

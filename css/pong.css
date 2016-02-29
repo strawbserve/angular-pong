@@ -61,6 +61,9 @@ span.key-icon.arrow {
 .score.right {
     right: 40%;
 }
+input[type="color"] {
+    margin: 0px 10px 0px 5px;
+}
 input.radio-left {
     margin-left: 20px;
 }
