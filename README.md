@@ -30,4 +30,3 @@ TODO:
   - "play to" score (acknowledge winner?)
   - set control keys
   - color selectors for background/ball/paddles
-- foo
