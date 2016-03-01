@@ -1,4 +1,11 @@
 angular.module('pongApp', ['ui.bootstrap'])
+.filter('capitalize', function() {
+    return function(input) {
+        if (null == input) { return; }
+        input = input.toLowerCase();
+        return input.substring(0,1).toUpperCase() + input.substring(1);
+    }
+})
 .factory('Data', function() {
     return {
         settings: {
@@ -7,10 +14,12 @@ angular.module('pongApp', ['ui.bootstrap'])
                 autoSide: 'left',
                 soundOn: 1,
                 paddleSpeed: 50,
-                courtColor: '#333333',
-                paddleColor: '#cccccc',
-                ballColor: '#cccccc',
-                showDirections: true
+                showDirections: true,
+                colors: {
+                    court: '#333333',
+                    paddle: '#cccccc',
+                    ball: '#cccccc'
+                }
             },
             active: false,
             localStorageId: 'angular-pong.settings',
@@ -85,7 +94,6 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         modalInstance.result.then(function (settings) {
             $scope.settings = settings;
-console.log($scope.settings.courtColor);
             Data.settings.save(settings);
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
@@ -471,9 +479,9 @@ console.log($scope.settings.courtColor);
         restrict: 'A',
         link: function(scope, element, attrs) {
             scope.$watch(
-                function() { return scope.settings.courtColor; },
+                function() { return scope.settings.colors.court; },
                 function() {
-                    element.css('background-color', scope.settings.courtColor);
+                    element.css('background-color', scope.settings.colors.court);
                 }
             );
         }
@@ -499,11 +507,11 @@ console.log($scope.settings.courtColor);
                 }
             );
             scope.$watch(
-                function() { return scope.settings.ballColor; },
+                function() { return scope.settings.colors.ball; },
                 function(color) {
                     element.css(
                         'background-color',
-                        scope.settings.ballColor
+                        scope.settings.colors.ball
                     );
                 }
             );
@@ -530,11 +538,11 @@ console.log($scope.settings.courtColor);
                 }
             );
             scope.$watch(
-                function() { return scope.settings.paddleColor; },
+                function() { return scope.settings.colors.paddle; },
                 function() {
                     element.css(
                         'background-color',
-                        scope.settings.paddleColor
+                        scope.settings.colors.paddle
                     );
                 }
             );

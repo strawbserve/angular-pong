@@ -82,12 +82,13 @@
                     <label for="autoSide">Right</label>
                 </p>
                 <p>
-                    <label for="courtColor">Court color </label>
-                    <input type="color" ng-model="settings.courtColor" />
-                    <label for="paddleColor">Paddle color </label>
-                    <input type="color" ng-model="settings.paddleColor" />
-                    <label for="ballColor">Ball color </label>
-                    <input type="color" ng-model="settings.ballColor" />
+                    <label>Colors:&nbsp;</label>
+                    <span ng-repeat="(item, color) in settings.colors">
+                        <label for="{{ item }}Color">{{ item | capitalize }}</label>
+                        <input type="color"
+                               name="{{ item }}Color"
+                               ng-model="settings.colors[item]" />
+                    </span>
                 </p>
                 <p>
                     <label for="paddleSpeed">Paddle Speed</label>
