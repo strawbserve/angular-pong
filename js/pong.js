@@ -1,3 +1,4 @@
+var INTEGER_REGEXP = /^\-?\d+$/;
 angular.module('pongApp', ['ui.bootstrap'])
 .filter('capitalize', function() {
     return function(input) {
@@ -54,6 +55,8 @@ angular.module('pongApp', ['ui.bootstrap'])
 
     // The JSON calls get us a copy of the settings so we can cancel.
     $scope.settings = JSON.parse(JSON.stringify(Data.settings.get()));
+
+    $scope.settings.paddleSpeed = Number($scope.settings.paddleSpeed);
 
     $scope.$on('modalOkay', function(event, arg) {
         $scope.ok();
@@ -546,6 +549,30 @@ angular.module('pongApp', ['ui.bootstrap'])
                     );
                 }
             );
+        }
+    };
+})
+.directive('checkPaddleSpeed', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, elem, attrs, ctrl) {
+            ctrl.$validators.checkPaddleSpeed = function(modelValue, viewValue) {
+                var valid = true;
+                if ( ! INTEGER_REGEXP.test(modelValue) ) {
+                    valid = false;
+                }
+                else {
+                    if (modelValue < 1 || modelValue > 100) {
+                        valid = false;
+                    }
+                }
+                if ( ! valid ) {
+                    scope.settingsForm.$setValidity('checkPaddleSpeed', false);
+                    return false;
+                }
+                scope.settingsForm.$setValidity('checkPaddleSpeed', true);
+                return modelValue;
+            }
         }
     };
 })

@@ -20,6 +20,7 @@
         <paddle side="right" y="{{paddles.right.y}}"></paddle>
     </div>
     <script type="text/ng-template" id="myModalContent.html">
+        <form novalidate name="settingsForm">
         <div class="modal-header">
             <h3 class="modal-title">Angular Pong</h3>
             <h4>Instructions</h4>
@@ -34,7 +35,6 @@
             <p>Use the form below to fiddle with available customizations.</p>
         </div>
         <div class="modal-body">
-            <form>
                 <p>
                     <label>Sound</label>
                     <input type="radio"
@@ -92,21 +92,22 @@
                 </p>
                 <p>
                     <label for="paddleSpeed">Paddle Speed</label>
-                    <input type="text" class="text-paddle-speed" ng-model="settings.paddleSpeed"/>
-                    <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%">
-                    <div class="float-right">
+                    <input type="number" name="textPaddleSpeed" class="text-paddle-speed" ng-model="settings.paddleSpeed" check-paddle-speed/>
+                    <span class="error" ng-show="settingsForm.textPaddleSpeed.$error.checkPaddleSpeed"> must be an integer between 1 and 100</span>
+                    <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%"/>
+                    <div class="text-right">
                         <input type="checkbox"/ ng-model="settings.showDirections"/>
                         <label for="showDirections">Show this dialog on load</label>
                     </div>
                 </p>
-            </form>
         </div>
         <div class="modal-footer">
             <button class="btn btn-default" type="button" ng-click="clearLocal()">Clear Local Storage</button>
             <button class="btn btn-default" type="button" ng-click="resetSettings()">Reset</button>
-            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+            <button class="btn btn-primary" type="submit" ng-click="ok()" ng-disabled="settingsForm.$invalid">OK</button>
             <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
         </div>
+        </form>
     </script>
 
 </div>
