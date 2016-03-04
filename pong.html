@@ -2,6 +2,7 @@
 <html>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-touch.min.js"></script>
 <script src="js/angular/ui-bootstrap-tpls-1.1.2.min.js"></script>
 <script src="js/pong.js"></script>
 <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
@@ -92,7 +93,7 @@
                 </p>
                 <p>
                     <label for="paddleSpeed">Paddle Speed</label>
-                    <input type="number" name="textPaddleSpeed" class="text-paddle-speed" ng-model="settings.paddleSpeed" check-paddle-speed/>
+                    <input type="text" name="textPaddleSpeed" class="text-paddle-speed" ng-model="settings.paddleSpeed" check-paddle-speed/>
                     <span class="error" ng-show="settingsForm.textPaddleSpeed.$error.checkPaddleSpeed"> must be an integer between 1 and 100</span>
                     <input type="range" class="range-paddle-speed" min="0" max="100" ng-model="settings.paddleSpeed" width="50%"/>
                     <div class="text-right">

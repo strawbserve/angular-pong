@@ -56,8 +56,6 @@ angular.module('pongApp', ['ui.bootstrap'])
     // The JSON calls get us a copy of the settings so we can cancel.
     $scope.settings = JSON.parse(JSON.stringify(Data.settings.get()));
 
-    $scope.settings.paddleSpeed = Number($scope.settings.paddleSpeed);
-
     $scope.$on('modalOkay', function(event, arg) {
         $scope.ok();
     });
