@@ -1,5 +1,5 @@
 var INTEGER_REGEXP = /^\-?\d+$/;
-angular.module('pongApp', ['ui.bootstrap', 'ngTouch'])
+angular.module('pongApp', ['ui.bootstrap'])
 .filter('capitalize', function() {
     return function(input) {
         if (null == input) { return; }
@@ -519,16 +519,10 @@ angular.module('pongApp', ['ui.bootstrap', 'ngTouch'])
         }
     };
 })
-.directive('paddle', ['$swipe', function($swipe) {
+.directive('paddle', function() {
     return {
         restrict: 'E',
         link: function(scope, element, attrs) {
-$swipe.bind(element, {
-    start: function(coords) {
-        console.log(coords);
-        alert('touch');
-    }
-});
             element.addClass('paddle');
             element.css('height', scope.paddles.height + 'px');
             element.css('width', scope.paddles.width + 'px');
@@ -555,7 +549,7 @@ $swipe.bind(element, {
             );
         }
     };
-}])
+})
 .directive('checkPaddleSpeed', function() {
     return {
         require: 'ngModel',
