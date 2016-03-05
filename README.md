@@ -19,7 +19,6 @@ TODO:
 - work on modularity
   - ball/paddle functionality in `serve()`
   - key capture module?
-- download angular and bootstrap files and get off CDNs
 - one player mode: work on better algorithm
 - add left serve key
 - add multiplayer with web sockets?
