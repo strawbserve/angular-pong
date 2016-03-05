@@ -9,7 +9,9 @@ angular.module('pongApp', ['ui.bootstrap'])
 })
 .factory('Data', function() {
     return {
+        localStoragePrefix: 'angular-pong',
         settings: {
+            active: false,
             default: {
                 numPlayers: 1,
                 autoSide: 'left',
@@ -21,32 +23,43 @@ angular.module('pongApp', ['ui.bootstrap'])
                     paddle: '#cccccc',
                     ball: '#cccccc'
                 }
-            },
-            active: false,
-            localStorageId: 'angular-pong.settings',
-            get: function(setting) {
-                if (false === this.active) {
-                    this.active = JSON.parse(localStorage.getItem(this.localStorageId));
-                    if (null == this.active) {
-                        this.active = this.default;
-                    }
+            }
+        },
+        get: function(property, value) {
+            if (false === this[property].active) {
+                this[property].active = JSON.parse(
+                    localStorage.getItem(
+                        this.localStoragePrefix + '.' + property
+                    )
+                );
+                if (null == this[property].active) {
+                    this[property].active = this[property].default;
                 }
-                if (undefined != setting) {
-                    return this.active[setting];
-                } else {
-                    return this.active;
+            }
+            if (undefined != value) {
+                return this.active[property][value];
+            } else {
+                return this[property].active;
+            }
+        },
+        save: function(property, data) {
+            this[property].active = data;
+            localStorage.setItem(
+                this.localStoragePrefix + '.' + property,
+                JSON.stringify(data)
+            );
+        },
+        reset: function(property) {
+            this[property].active = this[property].default;
+            this.save(property, this[property].active);
+        },
+        clearLocal: function(property) {
+            if (undefined != property) {
+                localStorage.removeItem(this.localStoragePrefix + '.' + property);
+            } else {
+                for (item in localStorage) {
+                    localStorage.removeItem(item);
                 }
-            },
-            save: function(settings) {
-                this.active = settings;
-                localStorage.setItem(this.localStorageId, JSON.stringify(settings));
-            },
-            reset: function() {
-                this.active = this.default;
-                this.save(this.active);
-            },
-            clearLocal: function() {
-                localStorage.removeItem(this.localStorageId);
             }
         }
     }
@@ -54,19 +67,19 @@ angular.module('pongApp', ['ui.bootstrap'])
 .controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, Data) {
 
     // The JSON calls get us a copy of the settings so we can cancel.
-    $scope.settings = JSON.parse(JSON.stringify(Data.settings.get()));
+    $scope.settings = JSON.parse(JSON.stringify(Data.get('settings')));
 
     $scope.$on('modalOkay', function(event, arg) {
         $scope.ok();
     });
 
-    $scope.clearLocal = function() {
-        Data.settings.clearLocal();
+    $scope.clearLocalSettings = function() {
+        Data.clearLocal('settings');
     };
 
     $scope.resetSettings = function() {
-        Data.settings.reset();
-        $scope.settings = Data.settings.get();
+        Data.reset('settings');
+        $scope.settings = Data.get('settings');
     };
 
     $scope.ok = function() {
@@ -80,7 +93,7 @@ angular.module('pongApp', ['ui.bootstrap'])
 })
 .controller('PongController', ['$rootScope', '$scope', '$window', '$interval', '$uibModal', 'Data', function($rootScope, $scope, $window, $interval, $uibModal, Data) {
 
-    $scope.settings = Data.settings.get();
+    $scope.settings = Data.get('settings');
 
     $scope.animationsEnabled = true;
 
@@ -95,7 +108,7 @@ angular.module('pongApp', ['ui.bootstrap'])
 
         modalInstance.result.then(function (settings) {
             $scope.settings = settings;
-            Data.settings.save(settings);
+            Data.save('settings', settings);
         }, function () {
             //$log.info('Modal dismissed at: ' + new Date());
         });
