@@ -24,8 +24,6 @@ TODO:
 - add left serve key
 - add multiplayer with web sockets?
 - make it work on phones
-- form/validation
-  - min/max on paddle speed input
 - settings:
   - "play to" score (acknowledge winner?)
   - set control keys
