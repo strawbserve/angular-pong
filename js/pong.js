@@ -1,97 +1,26 @@
-var INTEGER_REGEXP = /^\-?\d+$/;
+var INTEGER_REGEXP = /^\-?\d+$/; // compile once
 angular.module('pongApp', ['ui.bootstrap'])
-.filter('capitalize', function() {
-    return function(input) {
-        if (null == input) { return; }
-        input = input.toLowerCase();
-        return input.substring(0,1).toUpperCase() + input.substring(1);
-    }
-})
-.factory('Data', function() {
-    return {
-        localStoragePrefix: 'angular-pong',
-        settings: {
-            active: false,
-            default: {
-                numPlayers: 1,
-                autoSide: 'left',
-                soundOn: 1,
-                paddleSpeed: 50,
-                showDirections: true,
-                colors: {
-                    court: '#333333',
-                    paddle: '#cccccc',
-                    ball: '#cccccc'
-                }
-            }
-        },
-        get: function(property, value) {
-            if (false === this[property].active) {
-                this[property].active = JSON.parse(
-                    localStorage.getItem(
-                        this.localStoragePrefix + '.' + property
-                    )
-                );
-                if (null == this[property].active) {
-                    this[property].active = this[property].default;
-                }
-            }
-            if (undefined != value) {
-                return this.active[property][value];
-            } else {
-                return this[property].active;
-            }
-        },
-        save: function(property, data) {
-            this[property].active = data;
-            localStorage.setItem(
-                this.localStoragePrefix + '.' + property,
-                JSON.stringify(data)
-            );
-        },
-        reset: function(property) {
-            this[property].active = this[property].default;
-            this.save(property, this[property].active);
-        },
-        clearLocal: function(property) {
-            if (undefined != property) {
-                localStorage.removeItem(this.localStoragePrefix + '.' + property);
-            } else {
-                for (item in localStorage) {
-                    localStorage.removeItem(item);
-                }
-            }
-        }
-    }
-})
-.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, Data) {
+.controller(
+'PongController', [
+'$rootScope', '$scope', '$window', '$interval', '$uibModal', 'Data',
+function($rootScope, $scope, $window, $interval, $uibModal, Data) {
 
-    // The JSON calls get us a copy of the settings so we can cancel.
-    $scope.settings = JSON.parse(JSON.stringify(Data.get('settings')));
+    var windowHeight = $window.innerHeight;
+    var windowWidth = $window.innerWidth;
 
-    $scope.$on('modalOkay', function(event, arg) {
-        $scope.ok();
-    });
+    var paddleHeightPercent = 15;
+    var paddleHeight = Math.floor(windowHeight*paddleHeightPercent/100);
+    var paddleMaxY = windowHeight - paddleHeight;
 
-    $scope.clearLocalSettings = function() {
-        Data.clearLocal('settings');
+    var keyMap = {
+        13: 'handleEnter',
+        27: 'handleEsc',
+        87: 'leftUp',   // w
+        83: 'leftDown', // s
+        38: 'rightUp',  // up arrow
+        40: 'rightDown' // down arrow
     };
-
-    $scope.resetSettings = function() {
-        Data.reset('settings');
-        $scope.settings = Data.get('settings');
-    };
-
-    $scope.ok = function() {
-        $uibModalInstance.close($scope.settings);
-    };
-
-    $scope.cancel = function() {
-        $uibModalInstance.dismiss('cancel');
-    };
-
-})
-.controller('PongController', ['$rootScope', '$scope', '$window', '$interval', '$uibModal', 'Data', function($rootScope, $scope, $window, $interval, $uibModal, Data) {
+    var intervals = {}
 
     $scope.settings = Data.get('settings');
 
@@ -110,37 +39,19 @@ angular.module('pongApp', ['ui.bootstrap'])
             $scope.settings = settings;
             Data.save('settings', settings);
         }, function () {
-            //$log.info('Modal dismissed at: ' + new Date());
+            // do nothing for now . . .
         });
 
         $scope.modal = modalInstance;;
     };
+
     if ($scope.settings.showDirections) {
         $scope.openModal();
     }
 
-/*
     $scope.toggleAnimation = function () {
           $scope.animationsEnabled = !$scope.animationsEnabled;
     };
-*/
-
-    var windowHeight = $window.innerHeight;
-    var windowWidth = $window.innerWidth;
-
-    var paddleHeightPercent = 15;
-    var paddleHeight = Math.floor(windowHeight*paddleHeightPercent/100);
-    var paddleMaxY = windowHeight - paddleHeight;
-
-    var keyMap = {
-        13: 'handleEnter',
-        27: 'handleEsc',
-        87: 'leftUp',   // w
-        83: 'leftDown', // s
-        38: 'rightUp',  // up arrow
-        40: 'rightDown' // down arrow
-    };
-    var intervals = {}
 
     intervals.ball = undefined;
 
@@ -494,6 +405,90 @@ angular.module('pongApp', ['ui.bootstrap'])
         }
     });
 }])
+.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, Data) {
+
+    // The JSON calls get us a copy of the settings so we can cancel.
+    $scope.settings = JSON.parse(JSON.stringify(Data.get('settings')));
+
+    $scope.$on('modalOkay', function(event, arg) {
+        $scope.ok();
+    });
+
+    $scope.clearLocalSettings = function() {
+        Data.clearLocal('settings');
+    };
+
+    $scope.resetSettings = function() {
+        Data.reset('settings');
+        $scope.settings = Data.get('settings');
+    };
+
+    $scope.ok = function() {
+        $uibModalInstance.close($scope.settings);
+    };
+
+    $scope.cancel = function() {
+        $uibModalInstance.dismiss('cancel');
+    };
+
+})
+.factory('Data', function() {
+    return {
+        localStoragePrefix: 'angular-pong',
+        settings: {
+            active: false,
+            default: {
+                numPlayers: 1,
+                autoSide: 'left',
+                soundOn: 1,
+                paddleSpeed: 50,
+                showDirections: true,
+                colors: {
+                    court: '#333333',
+                    paddle: '#cccccc',
+                    ball: '#cccccc'
+                }
+            }
+        },
+        get: function(property, value) {
+            if (false === this[property].active) {
+                this[property].active = JSON.parse(
+                    localStorage.getItem(
+                        this.localStoragePrefix + '.' + property
+                    )
+                );
+                if (null == this[property].active) {
+                    this[property].active = this[property].default;
+                }
+            }
+            if (undefined != value) {
+                return this.active[property][value];
+            } else {
+                return this[property].active;
+            }
+        },
+        save: function(property, data) {
+            this[property].active = data;
+            localStorage.setItem(
+                this.localStoragePrefix + '.' + property,
+                JSON.stringify(data)
+            );
+        },
+        reset: function(property) {
+            this[property].active = this[property].default;
+            this.save(property, this[property].active);
+        },
+        clearLocal: function(property) {
+            if (undefined != property) {
+                localStorage.removeItem(this.localStoragePrefix + '.' + property);
+            } else {
+                for (item in localStorage) {
+                    localStorage.removeItem(item);
+                }
+            }
+        }
+    }
+})
 .directive('court', function() {
     return {
         restrict: 'A',
@@ -592,5 +587,12 @@ angular.module('pongApp', ['ui.bootstrap'])
             }
         }
     };
+})
+.filter('capitalize', function() {
+    return function(input) {
+        if (null == input) { return; }
+        input = input.toLowerCase();
+        return input.substring(0,1).toUpperCase() + input.substring(1);
+    }
 })
 ;
