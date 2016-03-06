@@ -142,6 +142,8 @@ angular.module('pongApp', ['ui.bootstrap'])
     };
     var intervals = {}
 
+    intervals.ball = undefined;
+
     $scope.wallBeep = new Audio("pong_8bit_wall.wav");
     $scope.paddleBeep = new Audio("pong_8bit_paddle.wav");
     $scope.outBeep = new Audio("pong_8bit_out.wav");
@@ -178,7 +180,7 @@ angular.module('pongApp', ['ui.bootstrap'])
             if (angular.isDefined(intervals[side + direction])) return;
             var sign = ('up' == direction) ? -1 : 1; 
             intervals[side + direction] = $interval(function() {
-                // Note: This runs in the window scope because $interval().
+                // This runs in the window scope because $interval().
                 if (1 == sign && paddleMaxY <= $scope.paddles[side].y) return;
                 if (-1 == sign && 0 >= $scope.paddles[side].y) return;
                 $scope.paddles[side].y += ($scope.settings.paddleSpeed/10) * sign;
@@ -224,6 +226,9 @@ angular.module('pongApp', ['ui.bootstrap'])
             }
         }
     };
+    // Note: References to `$scope.ball` as opposed to `this` inside
+    // `$scope.ball` are because the sccope changes to `Window` when
+    // called from within `interval()`.
     $scope.ball = {
         height: 20,
         width: 20,
@@ -234,6 +239,80 @@ angular.module('pongApp', ['ui.bootstrap'])
             y: 0
         },
         color: '#ccc',
+        move: function() {
+            $scope.ball.ts = undefined;
+            if (angular.isDefined(intervals.ball)) return;
+            intervals.ball = $interval(function() {
+                // This runs in the window scope because $interval().
+                if ($scope.settings.numPlayers == 1) {
+                    $scope.paddles.auto($scope.settings.autoSide);
+                }
+                var dimensions = {
+                    x: windowWidth,
+                    y: windowHeight
+                };
+                var now = new Date().getTime();
+                var elapsed = ($scope.ball.ts || now) - now;
+
+                $scope.ball.ts = now;
+
+                $scope.ball.updatePosition('x', elapsed);
+                $scope.ball.updatePosition('y', elapsed);
+
+                $scope.ball.updateDirection('x', $scope.ball.x);
+                $scope.ball.updateDirection('y', $scope.ball.y);
+
+            }, 20);
+        },
+        updatePosition: function(axis, elapsed) {
+            var velocity = this.velocities[axis]/1000;
+            this[axis] += Math.floor(elapsed * velocity);
+        },
+        updateDirection: function(axis, value) {
+            if (this.touchesTop()) {
+                this.bounce('y', 'min');
+                return;
+            }
+            if (this.touchesBottom()) {
+                this.bounce('y', 'max');
+                return;
+            }
+            if (this.touchesPaddle()) {
+                var side = this.direction();
+                this.whack(side);
+                var magnitude = 'max';
+                if (side == 'left') {
+                    magnitude = 'min';
+                }
+                this.bounce('x', magnitude);
+                return;
+            }
+            if (this.isOut()) {
+                $scope.sideOut = this.direction();
+                $scope.scores[$scope.otherSide($scope.sideOut)]++;
+                this.setFinalX();
+                $scope.playSound('outBeep');
+                $scope.stopGame();
+                return;
+            }
+        },
+        bounce: function(axis, magnitude) {
+            var dimensions = {
+                x: windowWidth,
+                y: windowHeight
+            };
+            var min = 21;
+            var max = dimensions[axis] - 20;
+            if ('max' == magnitude) {
+                this[axis] = 2 * max - this[axis];
+            }
+            if ('min' == magnitude) {
+                this[axis] = 1;
+            }
+            this.velocities[axis] *= -1;
+            if ('y' == axis) { $scope.playSound('wallBeep'); }
+            if ('x' == axis) { $scope.playSound('paddleBeep'); }
+        },
         touchesTop: function() {
             return this.y <= 0;
         },
@@ -277,79 +356,6 @@ angular.module('pongApp', ['ui.bootstrap'])
                 this.x = windowWidth - this.width;
             }
         }
-    };
-    intervals.ball = undefined;
-    $scope.startGame = function() {
-        $scope.ball.ts = undefined;
-        if (angular.isDefined(intervals.ball)) return;
-        intervals.ball = $interval(function() {
-            if ($scope.settings.numPlayers == 1) {
-                $scope.paddles.auto($scope.settings.autoSide);
-            }
-            var dimensions = {
-                x: windowWidth,
-                y: windowHeight
-            };
-            var now = new Date().getTime();
-            var elapsed = ($scope.ball.ts || now) - now;
-
-            $scope.ball.ts = now;
-
-            updateBallPosition('x');
-            updateBallPosition('y');
-            function updateBallPosition(axis) {
-                var velocity = $scope.ball.velocities[axis]/1000;
-                $scope.ball[axis] += Math.floor(elapsed * velocity);
-            }
-
-            updateBallDirection('x', $scope.ball.x);
-            updateBallDirection('y', $scope.ball.y);
-            function updateBallDirection(axis, value) {
-                function bounce(axis, magnitude) {
-                    var dimensions = {
-                        x: windowWidth,
-                        y: windowHeight
-                    };
-                    var min = 21;
-                    var max = dimensions[axis] - 20;
-                    if ('max' == magnitude) {
-                        $scope.ball[axis] = 2 * max - $scope.ball[axis];
-                    }
-                    if ('min' == magnitude) {
-                        $scope.ball[axis] = 1;
-                    }
-                    $scope.ball.velocities[axis] *= -1;
-                    if ('y' == axis) { $scope.playSound('wallBeep'); }
-                    if ('x' == axis) { $scope.playSound('paddleBeep'); }
-                }
-                if ($scope.ball.touchesTop()) {
-                    bounce('y', 'min');
-                    return;
-                }
-                if ($scope.ball.touchesBottom()) {
-                    bounce('y', 'max');
-                    return;
-                }
-                if ($scope.ball.touchesPaddle()) {
-                    var side = $scope.ball.direction();
-                    $scope.ball.whack(side);
-                    var magnitude = 'max';
-                    if (side == 'left') {
-                        magnitude = 'min';
-                    }
-                    bounce('x', magnitude);
-                    return;
-                }
-                if ($scope.ball.isOut()) {
-                    $scope.sideOut = $scope.ball.direction();
-                    $scope.scores[$scope.otherSide($scope.sideOut)]++;
-                    $scope.ball.setFinalX();
-                    $scope.playSound('outBeep');
-                    $scope.stopGame();
-                    return;
-                }
-            }
-        }, 20);
     };
     $scope.handleEnter = function() {
         if ($scope.modalIsOpen()) {
@@ -434,7 +440,7 @@ angular.module('pongApp', ['ui.bootstrap'])
             sign = -1;
         }
         $scope.ball.velocities.x *= sign;
-        $scope.startGame();
+        $scope.ball.move();
     };
     $scope.getRandomVelocity = function(axis) {
         var side = windowHeight;
