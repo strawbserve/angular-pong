@@ -17,7 +17,7 @@ NOTES:
 TODO:
 
 - work on modularity
-  - ball/paddle functionality in `serve()`
+  - make Data service free-standing
   - key capture module?
 - one player mode: work on better algorithm
 - add left serve key
@@ -26,4 +26,3 @@ TODO:
 - settings:
   - "play to" score (acknowledge winner?)
   - set control keys
-  - color selectors for background/ball/paddles
